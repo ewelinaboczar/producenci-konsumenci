@@ -39,7 +39,7 @@ int main()
         printf("[MAIN]-> error ftok\n");
         exit(1);
     }
-    msgId = msgget(klucz_msg, IPC_CREAT | 0666);
+    msgId = msgget(klucz_msg, IPC_CREAT | IPC_EXCL | 0666);
     if (msgId == -1)
 	{
         printf("[MAIN]-> blad kolejki komunikatow\n"); 
@@ -52,7 +52,7 @@ int main()
         printf("[MAIN]-> error ftok\n");
         exit(1);
     }
-	shmId = shmget(klucz_shm, MAX2 * sizeof(int), IPC_CREAT | 0666);
+	shmId = shmget(klucz_shm, MAX2 * sizeof(int), IPC_CREAT | IPC_EXCL | 0666);
     if (shmId == -1)
 	{
         printf("[MAIN]-> blad pamieci dzielonej\n"); 
@@ -75,7 +75,7 @@ int main()
         printf("[MAIN]-> error ftok\n");
         exit(1);
     }
-    semId = alokujSemafor(klucz_sem, 2, IPC_CREAT | 0666);
+    semId = alokujSemafor(klucz_sem, 2, IPC_CREAT | IPC_EXCL | 0666);
     for (int k = 0; k < 2; k++)
         inicjalizujSemafor(semId, k, 1);
 
@@ -116,4 +116,4 @@ int main()
 
     printf("[MAIN] koniec\n");
     return 0;
-}
+} 

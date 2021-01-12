@@ -30,7 +30,7 @@ int main()
    int shmId;
    int semId;
 
-   int index,pid;
+   int i,pid;
    struct bufor komunikat;
 
    printf("[KONSUMENT]------------------------------------\n");
@@ -50,7 +50,7 @@ if (msgId==-1)
 }
 
 //uzyskanie dostepu do pamieci dzielonej
-if ( (klucz_shm = ftok(".", 'B')) == -1 )
+if ( (klucz_shm = ftok(".", 'A')) == -1 )
 {
         printf("Blad ftok (kons)\n");
         exit(1);
@@ -72,8 +72,6 @@ if ((klucz_sem=ftok(".",'C')) == -1)
         exit(1);
     }
 semId = alokujSemafor(klucz_sem, 2, IPC_CREAT | IPC_EXCL | 0666);
-    for (int k = 0; k < 2; k++)
-        inicjalizujSemafor(semId, k, 1);
 
 //odbieranie/wysylanie odpowiednich komunikatow
 if(msgrcv(msgId, &komunikat, sizeof(komunikat.mvalue), PELNY, 0)== -1)
@@ -84,22 +82,22 @@ if(msgrcv(msgId, &komunikat, sizeof(komunikat.mvalue), PELNY, 0)== -1)
 //sekcja krytyczna -- semafor -- operacje na pamięci dzielonej
 waitSemafor(msgId,1,0);
 
-index=*(pam+11*sizeof(int));
 
-pid=*(pam+index*sizeof(int));
-printf("[KONSUMENT]odebrano komunikat[%d]: %s\n", index, komunikat.mtype);
-printf("[KONSUMENT]PID:%d odczyt z bufora nr: %d: %d\n",getpid(), index, pid);
+i=*(pam+11*sizeof(int));
 
-index++;
-if (index == MAX)
+
+pid=*(pam+i*sizeof(int)) ;
+printf("[KONSUMENT] -warosc[%d]: %d\n", i, pid);
+
+//modyfikowanie indeksu
+i++;
+if (i == MAX)
 {
-
-    index = 0;
+    i = 0;
 }
-*(pam + 11 * sizeof(int)) = index;
+*(pam + 11 * sizeof(int)) = i;
 
 signalSemafor(semId,1);
-
 
 //wysyłam komunikty do producentów
 komunikat.mtype=PUSTY;
@@ -121,4 +119,3 @@ return 0;
 //msgrcv -- odbiór komunikatu
 
 }
-

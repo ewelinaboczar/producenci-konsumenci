@@ -30,7 +30,7 @@ int main()
    int shmId;
    int semId;
 
-   int index,pid;
+   int i,pid;
    struct bufor komunikat;
 
 
@@ -50,7 +50,7 @@ if (msgId==-1)
 }
 
 //uzyskanie dostepu do pamieci dzielonej
-if ( (klucz_shm = ftok(".", 'B')) == -1 )
+if ( (klucz_shm = ftok(".", 'A')) == -1 )
 {
         printf("Blad ftok (prod)\n");
         exit(1);
@@ -71,9 +71,8 @@ if ((klucz_sem=ftok(".",'C')) == -1)
         printf("[PRODUCENT]-> error ftok\n");
         exit(1);
     }
-semId = alokujSemafor(klucz_sem, 2, IPC_CREAT | 0666);
-    for (int k = 0; k < 2; k++)
-        inicjalizujSemafor(semId, k, 1);
+semId = alokujSemafor(klucz_sem, 2, IPC_CREAT | IPC_EXCL | 0666);
+    
 
 //wysylanie/odbieranie odpowiednich komunikatow
 //czekamy na konsumenta
@@ -83,23 +82,21 @@ if(msgrcv(msgId, &komunikat, sizeof(komunikat.mvalue), PUSTY, 0)==-1)
 //operacje na pamieci dzielonej w sekcji krytycznej -- semafory
 waitSemafor(semId,0,0);
 
-index=*(pam+10*sizeof(int)); //czytanie indeksu
+i=*(pam+10*sizeof(int)); //czytanie indeksu
 
 //produkcja - dodanie rekordu do puli buforow  pod indeks - zapis  -- getpid()
 pid=getpid();
-*(pam+index*sizeof(int)) = pid;
-printf("[PRODUCENT]wyslano komunikat: %s",komunikat.mtype);
-printf("[PRODUCENT]PID:%d zapis do bufora nr: %d: %d\n",pid, index, pid);
+*(pam+i*sizeof(int)) = pid;
+printf("[PRODUCENT] +wartosc[%d]: %d\n", i, pid);
 
-index++;
-if(index==MAX) //modyfikowanie indeksu
+i++;
+if(i==MAX) //modyfikowanie indeksu
 {
-    index=0;
+    i=0;
 }
-*(pam+10*sizeof(int))=index;
+*(pam+10*sizeof(int))=i;
 
 signalSemafor(semId,0);
-
 
 //wyslanie odpowiedniego komunikatu
 komunikat.mtype=PELNY;
@@ -118,4 +115,3 @@ printf("[PRODUCENT] koniec\n");
 return 0;
 
 }
-

@@ -5,10 +5,10 @@ int alokujSemafor(key_t klucz, int number, int flagi)
    int semID;
    if ( (semID = semget(klucz, number, flagi)) == -1)
    {
-      perror("Blad semget (alokujSemafor): ");
-      exit(1);
+      semID=semget(klucz,number,IPC_CREAT|0666);
    }
    return semID;
+
 }
 
 int zwolnijSemafor(int semID, int number)
@@ -18,7 +18,7 @@ int zwolnijSemafor(int semID, int number)
 
 void inicjalizujSemafor(int semID, int number, int val)
 {
-   
+
    if ( semctl(semID, number, SETVAL, val) == -1 )
    {
       perror("Blad semctl (inicjalizujSemafor): ");
@@ -33,13 +33,13 @@ int waitSemafor(int semID, int number, int flags)
    operacje[0].sem_num = number;
    operacje[0].sem_op = -1;
    operacje[0].sem_flg = 0 | flags;//SEM_UNDO;
-   
+
    if ( semop(semID, operacje, 1) == -1 )
    {
       //perror("Blad semop (waitSemafor)");
       return -1;
    }
-   
+
    return 1;
 }
 
@@ -65,13 +65,10 @@ int valueSemafor(int semID, int number)
 double getRand(int *nseed)
 {
    double number;
-
    srand( *nseed );
    number = (double)rand();
    *nseed = (int)number;
    number /= (RAND_MAX+1.0);
-
    return number;
 }
-
 */
