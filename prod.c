@@ -50,7 +50,7 @@ if (msgId==-1)
 }
 
 //uzyskanie dostepu do pamieci dzielonej
-if ( (klucz_shm = ftok(".", 'A')) == -1 )
+if ( (klucz_shm = ftok(".", 'B')) == -1 )
 {
         printf("Blad ftok (prod)\n");
         exit(1);
@@ -71,7 +71,7 @@ if ((klucz_sem=ftok(".",'C')) == -1)
         printf("[PRODUCENT]-> error ftok\n");
         exit(1);
     }
-semId = alokujSemafor(klucz_sem, 2, IPC_CREAT | IPC_EXCL | 0666);
+semId = alokujSemafor(klucz_sem, 2, IPC_CREAT | 0666);
     for (int k = 0; k < 2; k++)
         inicjalizujSemafor(semId, k, 1);
 
