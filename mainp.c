@@ -39,7 +39,7 @@ int main()
         printf("[MAIN]-> error ftok\n");
         exit(1);
     }
-    msgId = msgget(klucz_msg, IPC_CREAT | IPC_EXCL | 0666);
+    msgId = msgget(klucz_msg, IPC_CREAT | 0666);
     if (msgId == -1)
 	{
         printf("[MAIN]-> blad kolejki komunikatow\n"); 
