@@ -5,10 +5,10 @@ int alokujSemafor(key_t klucz, int number, int flagi)
    int semID;
    if ( (semID = semget(klucz, number, flagi)) == -1)
    {
-      semID=semget(klucz,number,IPC_CREAT|0666);
+      perror("Blad semget (alokujSemafor): ");
+      exit(1);
    }
    return semID;
-
 }
 
 int zwolnijSemafor(int semID, int number)

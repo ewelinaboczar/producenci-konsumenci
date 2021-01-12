@@ -30,7 +30,7 @@ int main()
    int shmId;
    int semId;
 
-   int i,pid;
+   int index,pid;
    struct bufor komunikat;
 
    printf("[KONSUMENT]------------------------------------\n");
@@ -84,22 +84,22 @@ if(msgrcv(msgId, &komunikat, sizeof(komunikat.mvalue), PELNY, 0)== -1)
 //sekcja krytyczna -- semafor -- operacje na pamięci dzielonej
 waitSemafor(msgId,1,0);
 
+index=*(pam+11*sizeof(int));
 
-i=*(pam+11*sizeof(int));
+pid=*(pam+index*sizeof(int));
+printf("[KONSUMENT]odebrano komunikat[%d]: %s\n", index, komunikat.mtype);
+printf("[KONSUMENT]PID:%d odczyt z bufora nr: %d: %d\n",getpid(), index, pid);
 
-pid=getpid();
-*(pam+i*sizeof(int)) = pid;
-printf("[KONSUMENT]odebrano komunikat[%d]: %d\n", i, pid);
-
-
-i++;
-if (i == MAX)
+index++;
+if (index == MAX)
 {
-    i = 0;
+
+    index = 0;
 }
-*(pam + 11 * sizeof(int)) = i;
+*(pam + 11 * sizeof(int)) = index;
 
 signalSemafor(semId,1);
+
 
 //wysyłam komunikty do producentów
 komunikat.mtype=PUSTY;

@@ -30,7 +30,7 @@ int main()
    int shmId;
    int semId;
 
-   int i,pid;
+   int index,pid;
    struct bufor komunikat;
 
 
@@ -83,21 +83,23 @@ if(msgrcv(msgId, &komunikat, sizeof(komunikat.mvalue), PUSTY, 0)==-1)
 //operacje na pamieci dzielonej w sekcji krytycznej -- semafory
 waitSemafor(semId,0,0);
 
-i=*(pam+10*sizeof(int)); //czytanie indeksu
+index=*(pam+10*sizeof(int)); //czytanie indeksu
 
 //produkcja - dodanie rekordu do puli buforow  pod indeks - zapis  -- getpid()
 pid=getpid();
-*(pam+i*sizeof(int)) = pid;
-printf("[PRODUCENT] wyslano komunikat[%d]: %d\n", i, pid);
+*(pam+index*sizeof(int)) = pid;
+printf("[PRODUCENT]wyslano komunikat: %s",komunikat.mtype);
+printf("[PRODUCENT]PID:%d zapis do bufora nr: %d: %d\n",pid, index, pid);
 
-i++;
-if(i==MAX) //modyfikowanie indeksu
+index++;
+if(index==MAX) //modyfikowanie indeksu
 {
-    i=0;
+    index=0;
 }
-*(pam+10*sizeof(int))=i;
+*(pam+10*sizeof(int))=index;
 
 signalSemafor(semId,0);
+
 
 //wyslanie odpowiedniego komunikatu
 komunikat.mtype=PELNY;
